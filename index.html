@@ -70,6 +70,8 @@ Early-stage cost estimation & process recommendation
   <button onclick="predict()">Predict Cost</button>
 
   <div class="result" id="output"></div>
+  <div class="result" id="insight"></div>
+
 </div>
 
 <script>
@@ -108,6 +110,10 @@ async function predict() {
     output.innerText = "Error: " + err.message;
   }
 }
+  document.getElementById("insight").innerHTML =
+  "Insight: Increasing quantity reduces per-unit cost. " +
+  "Recommended process changes based on scale.";
+
 </script>
 
 
