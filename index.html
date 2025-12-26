@@ -66,29 +66,43 @@
 </div>
 
 <script>
-  function predict() {
-    fetch("https://manufacturing-ai-backend.onrender.com/predict", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        quantity: Number(document.getElementById("quantity").value),
-        complexity: Number(document.getElementById("complexity").value),
-        material_cost: Number(document.getElementById("material").value)
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById("output").innerHTML = `
-        <b>Estimated Cost:</b> ₹${data.estimated_cost}<br>
-        <b>Recommended Process:</b> ${data.recommended_process}<br>
-        <b>Confidence:</b> ${data.confidence}
-      `;
-    })
-    .catch(() => {
-      document.getElementById("output").innerHTML = "Backend not responding.";
-    });
+async function predict() {
+  const output = document.getElementById("output");
+  output.innerText = "Connecting to backend...";
+
+  try {
+    const response = await fetch(
+      "https://manufacturing-ai-backend.onrender.com/predict",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          quantity: Number(document.getElementById("quantity").value),
+          complexity: Number(document.getElementById("complexity").value),
+          material_cost: Number(document.getElementById("material").value)
+        })
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("HTTP error " + response.status);
+    }
+
+    const data = await response.json();
+
+    output.innerHTML =
+      "Estimated Cost: ₹" + data.estimated_cost + "<br>" +
+      "Process: " + data.recommended_process + "<br>" +
+      "Confidence: " + data.confidence;
+
+  } catch (err) {
+    output.innerText = "Error: " + err.message;
   }
+}
 </script>
+
 
 </body>
 </html>
