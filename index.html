@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Manufacturing Intelligence Platform</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      background: #020617;
+      padding: 30px;
+      border-radius: 10px;
+      width: 350px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    h1 {
+      font-size: 18px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    input, button {
+      width: 100%;
+      margin-bottom: 12px;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+    }
+    input {
+      background: #1e293b;
+      color: white;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 15px;
+      background: #020617;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h1>AI Manufacturing Cost Advisor</h1>
+
+  <input id="quantity" type="number" placeholder="Production Quantity" value="100">
+  <input id="complexity" type="number" placeholder="Complexity (1–5)" value="3">
+  <input id="material" type="number" placeholder="Material Cost" value="40">
+
+  <button onclick="predict()">Predict Cost</button>
+
+  <div class="result" id="output"></div>
+</div>
+
+<script>
+  function predict() {
+    fetch("https://manufacturing-ai-backend.onrender.com/predict", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        quantity: Number(document.getElementById("quantity").value),
+        complexity: Number(document.getElementById("complexity").value),
+        material_cost: Number(document.getElementById("material").value)
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("output").innerHTML = `
+        <b>Estimated Cost:</b> ₹${data.estimated_cost}<br>
+        <b>Recommended Process:</b> ${data.recommended_process}<br>
+        <b>Confidence:</b> ${data.confidence}
+      `;
+    })
+    .catch(() => {
+      document.getElementById("output").innerHTML = "Backend not responding.";
+    });
+  }
+</script>
+
+</body>
+</html>
