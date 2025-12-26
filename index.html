@@ -76,45 +76,50 @@ Early-stage cost estimation & process recommendation
 
 <script>
 async function predict() {
+  const quantity = Number(document.getElementById("quantity").value);
+  const complexity = Number(document.getElementById("complexity").value);
+  const material = Number(document.getElementById("material").value);
+
   const output = document.getElementById("output");
-  output.innerText = "Connecting to backend...";
+  const curveBox = document.getElementById("curve");
+  const insightBox = document.getElementById("insight");
+
+  output.innerHTML = "Calculating...";
+  curveBox.innerHTML = "";
+  insightBox.innerHTML = "";
 
   try {
     const response = await fetch(
-      "https://manufacturing-ai-backend.onrender.com/predict",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          quantity: Number(document.getElementById("quantity").value),
-          complexity: Number(document.getElementById("complexity").value),
-          material_cost: Number(document.getElementById("material").value)
-        })
-      }
+      "https://manufacturing-ai-backend.onrender.com/predict" +
+      "?quantity=" + quantity +
+      "&complexity=" + complexity +
+      "&material_cost=" + material
     );
-
-    if (!response.ok) {
-      throw new Error("HTTP error " + response.status);
-    }
 
     const data = await response.json();
 
+    /* ===== MAIN RESULT ===== */
     output.innerHTML =
-      "Estimated Cost: ₹" + data.estimated_cost + "<br>" +
-      "Process: " + data.recommended_process + "<br>" +
-      "Confidence: " + data.confidence;
+      "<b>Estimated Cost:</b> ₹" + data.estimated_cost + "<br>" +
+      "<b>Recommended Process:</b> " + data.recommended_process + "<br>" +
+      "<b>Confidence:</b> " + data.confidence;
 
-  } catch (err) {
-    output.innerText = "Error: " + err.message;
-  }
-}
-  document.getElementById("insight").innerHTML =
-  "Insight: Increasing quantity reduces per-unit cost. " +
-  "Recommended process changes based on scale.";
+    /* ===== COST vs QUANTITY TREND ===== */
+    let curveHTML = "<b>Cost vs Quantity Trend</b><br>";
+    for (let q = 50; q <= 500; q += 50) {
+      let cost = (material * 0.6) + (complexity * 50) + (1000 / q);
+      curveHTML += "Qty " + q + " → ₹" + cost.toFixed(1) + "<br>";
+    }
+    curveBox.innerHTML = curveHTML;
 
-</script>
+    /* ===== ENGINEERING INSIGHTS ===== */
+    let insight = "Insight: Increasing production quantity reduces per-unit cost.";
+    if (complexity >= 4) {
+      insight += "<br>⚠️ High complexity significantly increases machining cost.";
+    }
+    if (quantity >= 300) {
+      insight += "<br>💡 Consider casting for
+
 
 
 </body>
