@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>AI Manufacturing Intelligence Platform</title>
+  <title>Manufacturing Cost & Process Intelligence</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,63 +14,88 @@
       align-items: center;
       height: 100vh;
     }
+
     .card {
       background: #020617;
       padding: 30px;
-      border-radius: 10px;
-      width: 350px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      border-radius: 12px;
+      width: 380px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.6);
     }
+
     h1 {
-      font-size: 18px;
-      margin-bottom: 20px;
       text-align: center;
+      font-size: 18px;
+      margin-bottom: 6px;
     }
-    input, button {
-      width: 100%;
-      margin-bottom: 12px;
-      padding: 10px;
-      border-radius: 5px;
-      border: none;
+
+    p {
+      text-align: center;
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 20px;
     }
+
+    label {
+      font-size: 13px;
+      margin-top: 10px;
+      display: block;
+    }
+
     input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: none;
       background: #1e293b;
       color: white;
     }
+
     button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 18px;
       background: #2563eb;
+      border: none;
+      border-radius: 6px;
       color: white;
       font-weight: bold;
       cursor: pointer;
     }
+
     .result {
       margin-top: 15px;
       background: #020617;
       padding: 10px;
-      border-radius: 5px;
-      font-size: 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      line-height: 1.4;
     }
   </style>
 </head>
+
 <body>
 
 <div class="card">
-  <h1>Manufacturing Cost & Process Intelligence</h1>
-<p style="text-align:center; font-size:13px; color:#94a3b8;">
-Early-stage cost estimation & process recommendation
-</p>
 
+  <h1>Manufacturing Cost & Process Intelligence</h1>
+  <p>Early-stage cost estimation & process recommendation</p>
 
   <label>Production Quantity</label>
-<input id="quantity" type="number" value="100">
-  <label>Complexity</label>
-  <input id="complexity" type="number" placeholder="Complexity (1–5)" value="3">
-   <label>Material Cost</label>
-  <input id="material" type="number" placeholder="Material Cost" value="40">
+  <input id="quantity" type="number" value="100">
+
+  <label>Complexity (1–5)</label>
+  <input id="complexity" type="number" value="3">
+
+  <label>Material Cost</label>
+  <input id="material" type="number" value="40">
 
   <button onclick="predict()">Predict Cost</button>
 
+  <!-- RESULT AREAS (THIS WAS MISSING) -->
   <div class="result" id="output"></div>
+  <div class="result" id="curve"></div>
   <div class="result" id="insight"></div>
 
 </div>
@@ -98,29 +124,7 @@ async function predict() {
 
     const data = await response.json();
 
-    /* ===== MAIN RESULT ===== */
+    // MAIN RESULT
     output.innerHTML =
-      "<b>Estimated Cost:</b> ₹" + data.estimated_cost + "<br>" +
-      "<b>Recommended Process:</b> " + data.recommended_process + "<br>" +
-      "<b>Confidence:</b> " + data.confidence;
+      "<b>Estimated Cost:
 
-    /* ===== COST vs QUANTITY TREND ===== */
-    let curveHTML = "<b>Cost vs Quantity Trend</b><br>";
-    for (let q = 50; q <= 500; q += 50) {
-      let cost = (material * 0.6) + (complexity * 50) + (1000 / q);
-      curveHTML += "Qty " + q + " → ₹" + cost.toFixed(1) + "<br>";
-    }
-    curveBox.innerHTML = curveHTML;
-
-    /* ===== ENGINEERING INSIGHTS ===== */
-    let insight = "Insight: Increasing production quantity reduces per-unit cost.";
-    if (complexity >= 4) {
-      insight += "<br>⚠️ High complexity significantly increases machining cost.";
-    }
-    if (quantity >= 300) {
-      insight += "<br>💡 Consider casting for
-
-
-
-</body>
-</html>
