@@ -1,174 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Manufacturing Cost & Process Intelligence</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Monospace font -->
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
 
   <style>
     body {
       margin: 0;
       min-height: 100vh;
+      background: #0f1115;
+      color: #e5e7eb;
+      font-family: 'JetBrains Mono', monospace;
       display: flex;
       justify-content: center;
       align-items: center;
-      background: radial-gradient(circle at top, #020617, #000);
-      font-family: "Segoe UI", Arial, sans-serif;
-      color: white;
     }
 
-    .card {
-      width: 420px;
-      padding: 28px;
-      background: #020617;
-      border-radius: 14px;
-      box-shadow: 0 0 45px rgba(0,0,0,0.7);
+    .dashboard {
+      width: 95%;
+      max-width: 1200px;
+      background: #161a20;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 0 40px rgba(0,0,0,0.6);
     }
 
     h1 {
-      font-size: 20px;
-      text-align: center;
-      margin-bottom: 4px;
+      margin: 0;
+      font-size: 22px;
     }
 
     .subtitle {
-      text-align: center;
       font-size: 13px;
-      color: #94a3b8;
+      color: #9ca3af;
       margin-bottom: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 24px;
+    }
+
+    .panel {
+      background: #0f1319;
+      border: 1px solid #2a2f38;
+      border-radius: 10px;
+      padding: 18px;
     }
 
     label {
       display: block;
-      margin-top: 12px;
-      font-size: 13px;
-      color: #cbd5f5;
+      margin-top: 14px;
+      font-size: 12px;
+      color: #9ca3af;
     }
 
     input {
       width: 100%;
-      padding: 9px;
-      margin-top: 5px;
+      margin-top: 6px;
+      padding: 8px;
+      background: #111827;
+      border: 1px solid #2a2f38;
       border-radius: 6px;
-      border: none;
-      background: #1e293b;
-      color: white;
+      color: #e5e7eb;
+      font-family: inherit;
     }
 
     button {
       width: 100%;
       margin-top: 18px;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      padding: 10px;
+      background: #374151;
+      border: 1px solid #4b5563;
       color: white;
-      font-size: 15px;
+      font-family: inherit;
       cursor: pointer;
     }
 
     button:hover {
-      opacity: 0.9;
+      background: #4b5563;
     }
 
     .result {
-      margin-top: 18px;
-      font-size: 14px;
-      color: #22c55e;
-      font-weight: 600;
-      text-align: center;
-      line-height: 1.5;
-    }
-
-    .section {
-      margin-top: 20px;
+      margin-top: 16px;
       font-size: 13px;
-      color: #cbd5f5;
+      line-height: 1.6;
+      color: #d1d5db;
     }
 
     canvas {
-      margin-top: 18px;
+      margin-top: 16px;
     }
   </style>
 </head>
 
 <body>
-  <div class="card">
+  <div class="dashboard">
     <h1>Manufacturing Cost & Process Intelligence</h1>
-    <div class="subtitle">Data-driven cost estimation & process recommendation</div>
-
-    <label>Production Quantity</label>
-    <input id="quantity" type="number" value="100" />
-
-    <label>Complexity (1–5)</label>
-    <input id="complexity" type="number" value="3" min="1" max="5"/>
-
-    <label>Material Cost (₹ / unit)</label>
-    <input id="material" type="number" value="40" />
-
-    <label>Labor Cost (₹ / unit)</label>
-    <input id="labor" type="number" value="25" />
-
-    <label>Tooling Cost (₹ one-time)</label>
-    <input id="tooling" type="number" value="2000" />
-
-    <label>Overhead (%)</label>
-    <input id="overhead" type="number" value="10" />
-
-    <button onclick="predictCost()">Predict Cost</button>
-
-    <div class="section">
-      Upload CSV (optional):
-      <input type="file" accept=".csv" onchange="loadCSV(event)" />
+    <div class="subtitle">
+      Early-stage decision support for mechanical component manufacturing
     </div>
 
-    <div id="output" class="result"></div>
+    <div class="grid">
+      <!-- INPUT PANEL -->
+      <div class="panel">
+        <label>Production Quantity</label>
+        <input id="quantity" type="number" value="100">
 
-    <canvas id="trendChart"></canvas>
-    <canvas id="breakdownChart"></canvas>
+        <label>Complexity (1–5)</label>
+        <input id="complexity" type="number" value="3" min="1" max="5">
+
+        <label>Material Cost (₹ / unit)</label>
+        <input id="material" type="number" value="40">
+
+        <label>Labor Cost (₹ / unit)</label>
+        <input id="labor" type="number" value="25">
+
+        <label>Tooling Cost (₹ one-time)</label>
+        <input id="tooling" type="number" value="2000">
+
+        <label>Overhead (%)</label>
+        <input id="overhead" type="number" value="10">
+
+        <button onclick="predictCost()">Run Cost Analysis</button>
+
+        <div id="output" class="result"></div>
+      </div>
+
+      <!-- VISUALIZATION PANEL -->
+      <div class="panel">
+        <canvas id="trendChart"></canvas>
+        <canvas id="breakdownChart"></canvas>
+      </div>
+    </div>
   </div>
 
   <script>
     let trendChart, breakdownChart;
 
-    function predictCost(data = null) {
-      const q = data?.quantity ?? Number(quantity.value);
-      const c = data?.complexity ?? Number(complexity.value);
-      const m = data?.material ?? Number(material.value);
-      const l = data?.labor ?? Number(labor.value);
-      const t = Number(tooling.value);
-      const o = Number(overhead.value) / 100;
+    function predictCost() {
+      const q = +quantity.value;
+      const c = +complexity.value;
+      const m = +material.value;
+      const l = +labor.value;
+      const t = +tooling.value;
+      const o = +overhead.value / 100;
 
-      const complexityFactor = 1 + c * 0.15;
+      const factor = 1 + c * 0.15;
 
-      const materialCost = q * m * complexityFactor;
+      const materialCost = q * m * factor;
       const laborCost = q * l;
       const overheadCost = (materialCost + laborCost) * o;
-      const totalCost = materialCost + laborCost + overheadCost + t;
+      const total = materialCost + laborCost + overheadCost + t;
 
-      let process =
-        q <= 50 ? "CNC Machining (Low volume)" :
-        q <= 500 ? "CNC / Die Casting (Medium volume)" :
-        "Injection Molding / Casting (High volume)";
+      const process =
+        q <= 50 ? "CNC Machining" :
+        q <= 500 ? "CNC / Die Casting" :
+        "Injection Molding / Casting";
 
-      output.innerHTML =
-        `Total Cost: ₹${totalCost.toFixed(2)}<br/>
-         Material: ₹${materialCost.toFixed(0)} | Labor: ₹${laborCost.toFixed(0)}<br/>
-         Tooling: ₹${t} | Overhead: ₹${overheadCost.toFixed(0)}<br/>
-         Recommended Process: ${process}`;
+      output.innerHTML = `
+        Total Cost: ₹${total.toFixed(2)}<br>
+        Material: ₹${materialCost.toFixed(0)} | Labor: ₹${laborCost.toFixed(0)}<br>
+        Tooling: ₹${t} | Overhead: ₹${overheadCost.toFixed(0)}<br>
+        Recommended Process: ${process}
+      `;
 
-      drawCharts(q, m, l, c, t, o);
+      drawCharts(q, m, l, c);
     }
 
-    function drawCharts(q, m, l, c, t, o) {
-      const qty = [], costs = [];
+    function drawCharts(q, m, l, c) {
+      const qty = [], cost = [];
       for (let i = 10; i <= q * 1.5; i += q / 10) {
-        const factor = 1 + c * 0.15;
-        costs.push(i * (m * factor + l));
         qty.push(i);
+        cost.push(i * (m * (1 + c * 0.15) + l));
       }
 
       trendChart?.destroy();
@@ -176,33 +188,17 @@
 
       trendChart = new Chart(trendChartCanvas = document.getElementById("trendChart"), {
         type: "line",
-        data: { labels: qty, datasets: [{ label: "Cost vs Quantity", data: costs, tension: 0.3 }] }
+        data: { labels: qty, datasets: [{ label: "Cost vs Quantity", data: cost }] }
       });
 
       breakdownChart = new Chart(breakdownChartCanvas = document.getElementById("breakdownChart"), {
         type: "bar",
         data: {
-          labels: ["Material", "Labor", "Tooling", "Overhead"],
-          datasets: [{
-            data: [q*m, q*l, t, q*(m+l)*o]
-          }]
+          labels: ["Material", "Labor", "Tooling"],
+          datasets: [{ data: [q*m, q*l, +tooling.value] }]
         }
       });
-    }
-
-    function loadCSV(event) {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-
-      reader.onload = e => {
-        const [_, row] = e.target.result.trim().split("\n");
-        const [quantity, material, labor, complexity] = row.split(",").map(Number);
-        predictCost({ quantity, material, labor, complexity });
-      };
-
-      reader.readAsText(file);
     }
   </script>
 </body>
 </html>
-
