@@ -3,128 +3,127 @@
 <head>
   <meta charset="UTF-8" />
   <title>Manufacturing Cost & Process Intelligence</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #e5e7eb;
+      margin: 0;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      background: linear-gradient(135deg, #020617, #020617);
+      font-family: Arial, Helvetica, sans-serif;
+      color: white;
     }
 
     .card {
-      background: #020617;
-      padding: 30px;
-      border-radius: 12px;
       width: 380px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.6);
+      padding: 30px;
+      background: #020617;
+      border-radius: 12px;
+      box-shadow: 0 0 40px rgba(0,0,0,0.6);
     }
 
     h1 {
+      font-size: 20px;
       text-align: center;
-      font-size: 18px;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
 
-    p {
+    .subtitle {
       text-align: center;
       font-size: 13px;
       color: #94a3b8;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
     }
 
     label {
-      font-size: 13px;
-      margin-top: 10px;
       display: block;
+      margin-top: 15px;
+      font-size: 13px;
+      color: #cbd5f5;
     }
 
     input {
       width: 100%;
       padding: 10px;
-      margin-top: 5px;
+      margin-top: 6px;
       border-radius: 6px;
       border: none;
+      outline: none;
       background: #1e293b;
       color: white;
+      font-size: 14px;
     }
 
     button {
       width: 100%;
-      padding: 10px;
-      margin-top: 18px;
-      background: #2563eb;
+      margin-top: 25px;
+      padding: 12px;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
+      background: #2563eb;
       color: white;
-      font-weight: bold;
+      font-size: 15px;
       cursor: pointer;
     }
 
+    button:hover {
+      background: #1d4ed8;
+    }
+
     .result {
-      margin-top: 15px;
-      background: #020617;
-      padding: 10px;
-      border-radius: 6px;
-      font-size: 13px;
-      line-height: 1.4;
+      margin-top: 20px;
+      text-align: center;
+      font-size: 16px;
+      color: #22c55e;
+      font-weight: bold;
     }
   </style>
 </head>
 
 <body>
 
-<div class="card">
+  <div class="card">
+    <h1>Manufacturing Cost & Process Intelligence</h1>
+    <div class="subtitle">
+      Early-stage cost estimation & process recommendation
+    </div>
 
-  <h1>Manufacturing Cost & Process Intelligence</h1>
-  <p>Early-stage cost estimation & process recommendation</p>
+    <label>Production Quantity</label>
+    <input id="quantity" type="number" value="100" />
 
-  <label>Production Quantity</label>
-  <input id="quantity" type="number" value="100">
+    <label>Complexity (1–5)</label>
+    <input id="complexity" type="number" min="1" max="5" value="3" />
 
-  <label>Complexity (1–5)</label>
-  <input id="complexity" type="number" value="3">
+    <label>Material Cost (₹ per unit)</label>
+    <input id="material" type="number" value="40" />
 
-  <label>Material Cost</label>
-  <input id="material" type="number" value="40">
+    <button onclick="predictCost()">Predict Cost</button>
 
-  <button onclick="predict()">Predict Cost</button>
+    <div id="output" class="result"></div>
+  </div>
 
-  <!-- RESULT AREAS (THIS WAS MISSING) -->
-  <div class="result" id="output"></div>
-  <div class="result" id="curve"></div>
-  <div class="result" id="insight"></div>
+  <script>
+    function predictCost() {
+      const quantity = Number(document.getElementById("quantity").value);
+      const complexity = Number(document.getElementById("complexity").value);
+      const materialCost = Number(document.getElementById("material").value);
 
-</div>
+      if (quantity <= 0 || materialCost <= 0 || complexity < 1 || complexity > 5) {
+        document.getElementById("output").innerText =
+          "Please enter valid input values.";
+        return;
+      }
 
-<script>
-async function predict() {
-  const quantity = Number(document.getElementById("quantity").value);
-  const complexity = Number(document.getElementById("complexity").value);
-  const material = Number(document.getElementById("material").value);
+      const complexityFactor = 1 + complexity * 0.15;
+      const estimatedCost = quantity * materialCost * complexityFactor;
 
-  const output = document.getElementById("output");
-  const curveBox = document.getElementById("curve");
-  const insightBox = document.getElementById("insight");
+      document.getElementById("output").innerText =
+        "Estimated Manufacturing Cost: ₹" + estimatedCost.toFixed(2);
+    }
+  </script>
 
-  output.innerHTML = "Calculating...";
-  curveBox.innerHTML = "";
-  insightBox.innerHTML = "";
-
-  try {
-    const response = await fetch(
-      "https://manufacturing-ai-backend.onrender.com/predict" +
-      "?quantity=" + quantity +
-      "&complexity=" + complexity +
-      "&material_cost=" + material
-    );
-
-    const data = await response.json();
-
-    // MAIN RESULT
-    output.innerHTML =
-      "<b>Estimated Cost:
-
+</body>
+</html>
