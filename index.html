@@ -4,185 +4,205 @@
   <meta charset="UTF-8" />
   <title>Manufacturing Cost & Process Intelligence</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     body {
       margin: 0;
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      background: linear-gradient(135deg, #020617, #020617);
-      font-family: Arial, Helvetica, sans-serif;
+      background: radial-gradient(circle at top, #020617, #000);
+      font-family: "Segoe UI", Arial, sans-serif;
       color: white;
     }
 
     .card {
-      width: 380px;
-      padding: 30px;
+      width: 420px;
+      padding: 28px;
       background: #020617;
-      border-radius: 12px;
-      box-shadow: 0 0 40px rgba(0,0,0,0.6);
+      border-radius: 14px;
+      box-shadow: 0 0 45px rgba(0,0,0,0.7);
     }
 
     h1 {
       font-size: 20px;
       text-align: center;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
     }
 
     .subtitle {
       text-align: center;
       font-size: 13px;
       color: #94a3b8;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
 
     label {
       display: block;
-      margin-top: 15px;
+      margin-top: 12px;
       font-size: 13px;
       color: #cbd5f5;
     }
 
     input {
       width: 100%;
-      padding: 10px;
-      margin-top: 6px;
+      padding: 9px;
+      margin-top: 5px;
       border-radius: 6px;
       border: none;
-      outline: none;
       background: #1e293b;
       color: white;
-      font-size: 14px;
     }
 
     button {
       width: 100%;
-      margin-top: 25px;
+      margin-top: 18px;
       padding: 12px;
       border: none;
       border-radius: 8px;
-      background: #2563eb;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
       color: white;
       font-size: 15px;
       cursor: pointer;
     }
 
     button:hover {
-      background: #1d4ed8;
+      opacity: 0.9;
     }
 
     .result {
-      margin-top: 20px;
-      text-align: center;
-      font-size: 16px;
+      margin-top: 18px;
+      font-size: 14px;
       color: #22c55e;
-      font-weight: bold;
+      font-weight: 600;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .section {
+      margin-top: 20px;
+      font-size: 13px;
+      color: #cbd5f5;
+    }
+
+    canvas {
+      margin-top: 18px;
     }
   </style>
 </head>
 
 <body>
-
   <div class="card">
     <h1>Manufacturing Cost & Process Intelligence</h1>
-    <div class="subtitle">
-      Early-stage cost estimation & process recommendation
-    </div>
+    <div class="subtitle">Data-driven cost estimation & process recommendation</div>
 
     <label>Production Quantity</label>
     <input id="quantity" type="number" value="100" />
 
     <label>Complexity (1–5)</label>
-    <input id="complexity" type="number" min="1" max="5" value="3" />
+    <input id="complexity" type="number" value="3" min="1" max="5"/>
 
-    <label>Material Cost (₹ per unit)</label>
+    <label>Material Cost (₹ / unit)</label>
     <input id="material" type="number" value="40" />
+
+    <label>Labor Cost (₹ / unit)</label>
+    <input id="labor" type="number" value="25" />
+
+    <label>Tooling Cost (₹ one-time)</label>
+    <input id="tooling" type="number" value="2000" />
+
+    <label>Overhead (%)</label>
+    <input id="overhead" type="number" value="10" />
 
     <button onclick="predictCost()">Predict Cost</button>
 
-    <div id="output" class="result"></div>
-    <canvas id="costChart" style="margin-top:20px;"></canvas>
+    <div class="section">
+      Upload CSV (optional):
+      <input type="file" accept=".csv" onchange="loadCSV(event)" />
+    </div>
 
+    <div id="output" class="result"></div>
+
+    <canvas id="trendChart"></canvas>
+    <canvas id="breakdownChart"></canvas>
   </div>
 
   <script>
-  let chart = null;
+    let trendChart, breakdownChart;
 
-  function predictCost() {
-    const quantity = Number(document.getElementById("quantity").value);
-    const complexity = Number(document.getElementById("complexity").value);
-    const materialCost = Number(document.getElementById("material").value);
+    function predictCost(data = null) {
+      const q = data?.quantity ?? Number(quantity.value);
+      const c = data?.complexity ?? Number(complexity.value);
+      const m = data?.material ?? Number(material.value);
+      const l = data?.labor ?? Number(labor.value);
+      const t = Number(tooling.value);
+      const o = Number(overhead.value) / 100;
 
-    if (quantity <= 0 || materialCost <= 0 || complexity < 1 || complexity > 5) {
-      document.getElementById("output").innerText =
-        "Please enter valid input values.";
-      return;
+      const complexityFactor = 1 + c * 0.15;
+
+      const materialCost = q * m * complexityFactor;
+      const laborCost = q * l;
+      const overheadCost = (materialCost + laborCost) * o;
+      const totalCost = materialCost + laborCost + overheadCost + t;
+
+      let process =
+        q <= 50 ? "CNC Machining (Low volume)" :
+        q <= 500 ? "CNC / Die Casting (Medium volume)" :
+        "Injection Molding / Casting (High volume)";
+
+      output.innerHTML =
+        `Total Cost: ₹${totalCost.toFixed(2)}<br/>
+         Material: ₹${materialCost.toFixed(0)} | Labor: ₹${laborCost.toFixed(0)}<br/>
+         Tooling: ₹${t} | Overhead: ₹${overheadCost.toFixed(0)}<br/>
+         Recommended Process: ${process}`;
+
+      drawCharts(q, m, l, c, t, o);
     }
 
-    const complexityFactor = 1 + complexity * 0.15;
-    const estimatedCost = quantity * materialCost * complexityFactor;
-
-    let process = "";
-    if (quantity <= 50) {
-      process = "CNC Machining (Low-volume)";
-    } else if (quantity <= 500) {
-      process = "CNC Machining / Die Casting (Medium-volume)";
-    } else {
-      process = "Injection Molding / Casting (High-volume)";
-    }
-
-    document.getElementById("output").innerHTML =
-      `Estimated Manufacturing Cost: ₹${estimatedCost.toFixed(2)}<br/>
-       Recommended Process: ${process}`;
-
-    generateChart(quantity, complexity, materialCost);
-  }
-
-  function generateChart(baseQty, complexity, materialCost) {
-    const quantities = [];
-    const costs = [];
-
-    for (let q = 10; q <= baseQty * 1.5; q += Math.max(10, baseQty / 10)) {
-      const factor = 1 + complexity * 0.15;
-      quantities.push(q);
-      costs.push(q * materialCost * factor);
-    }
-
-    const ctx = document.getElementById("costChart").getContext("2d");
-
-    if (chart) {
-      chart.destroy();
-    }
-
-    chart = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: quantities,
-        datasets: [{
-          label: "Estimated Cost vs Quantity",
-          data: costs,
-          borderWidth: 2,
-          tension: 0.3
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: true }
-        },
-        scales: {
-          x: { title: { display: true, text: "Production Quantity" } },
-          y: { title: { display: true, text: "Estimated Cost (₹)" } }
-        }
+    function drawCharts(q, m, l, c, t, o) {
+      const qty = [], costs = [];
+      for (let i = 10; i <= q * 1.5; i += q / 10) {
+        const factor = 1 + c * 0.15;
+        costs.push(i * (m * factor + l));
+        qty.push(i);
       }
-    });
-  }
-</script>
 
+      trendChart?.destroy();
+      breakdownChart?.destroy();
 
+      trendChart = new Chart(trendChartCanvas = document.getElementById("trendChart"), {
+        type: "line",
+        data: { labels: qty, datasets: [{ label: "Cost vs Quantity", data: costs, tension: 0.3 }] }
+      });
+
+      breakdownChart = new Chart(breakdownChartCanvas = document.getElementById("breakdownChart"), {
+        type: "bar",
+        data: {
+          labels: ["Material", "Labor", "Tooling", "Overhead"],
+          datasets: [{
+            data: [q*m, q*l, t, q*(m+l)*o]
+          }]
+        }
+      });
+    }
+
+    function loadCSV(event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = e => {
+        const [_, row] = e.target.result.trim().split("\n");
+        const [quantity, material, labor, complexity] = row.split(",").map(Number);
+        predictCost({ quantity, material, labor, complexity });
+      };
+
+      reader.readAsText(file);
+    }
+  </script>
 </body>
 </html>
+
