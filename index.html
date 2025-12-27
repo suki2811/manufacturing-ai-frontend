@@ -120,8 +120,20 @@
       const complexityFactor = 1 + complexity * 0.15;
       const estimatedCost = quantity * materialCost * complexityFactor;
 
-      document.getElementById("output").innerText =
-        "Estimated Manufacturing Cost: ₹" + estimatedCost.toFixed(2);
+      let process = "";
+
+if (quantity <= 50) {
+  process = "CNC Machining (Low-volume production)";
+} else if (quantity <= 500) {
+  process = "CNC Machining / Die Casting (Medium-volume production)";
+} else {
+  process = "Injection Molding / Casting (High-volume production)";
+}
+
+document.getElementById("output").innerHTML =
+  `Estimated Manufacturing Cost: ₹${estimatedCost.toFixed(2)}<br/>
+   Recommended Process: ${process}`;
+
     }
   </script>
 
