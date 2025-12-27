@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <title>Manufacturing Cost & Process Intelligence</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 
   <style>
     body {
@@ -103,39 +105,84 @@
     <button onclick="predictCost()">Predict Cost</button>
 
     <div id="output" class="result"></div>
+    <canvas id="costChart" style="margin-top:20px;"></canvas>
+
   </div>
 
   <script>
-    function predictCost() {
-      const quantity = Number(document.getElementById("quantity").value);
-      const complexity = Number(document.getElementById("complexity").value);
-      const materialCost = Number(document.getElementById("material").value);
+  let chart = null;
 
-      if (quantity <= 0 || materialCost <= 0 || complexity < 1 || complexity > 5) {
-        document.getElementById("output").innerText =
-          "Please enter valid input values.";
-        return;
-      }
+  function predictCost() {
+    const quantity = Number(document.getElementById("quantity").value);
+    const complexity = Number(document.getElementById("complexity").value);
+    const materialCost = Number(document.getElementById("material").value);
 
-      const complexityFactor = 1 + complexity * 0.15;
-      const estimatedCost = quantity * materialCost * complexityFactor;
-
-      let process = "";
-
-if (quantity <= 50) {
-  process = "CNC Machining (Low-volume production)";
-} else if (quantity <= 500) {
-  process = "CNC Machining / Die Casting (Medium-volume production)";
-} else {
-  process = "Injection Molding / Casting (High-volume production)";
-}
-
-document.getElementById("output").innerHTML =
-  `Estimated Manufacturing Cost: ₹${estimatedCost.toFixed(2)}<br/>
-   Recommended Process: ${process}`;
-
+    if (quantity <= 0 || materialCost <= 0 || complexity < 1 || complexity > 5) {
+      document.getElementById("output").innerText =
+        "Please enter valid input values.";
+      return;
     }
-  </script>
+
+    const complexityFactor = 1 + complexity * 0.15;
+    const estimatedCost = quantity * materialCost * complexityFactor;
+
+    let process = "";
+    if (quantity <= 50) {
+      process = "CNC Machining (Low-volume)";
+    } else if (quantity <= 500) {
+      process = "CNC Machining / Die Casting (Medium-volume)";
+    } else {
+      process = "Injection Molding / Casting (High-volume)";
+    }
+
+    document.getElementById("output").innerHTML =
+      `Estimated Manufacturing Cost: ₹${estimatedCost.toFixed(2)}<br/>
+       Recommended Process: ${process}`;
+
+    generateChart(quantity, complexity, materialCost);
+  }
+
+  function generateChart(baseQty, complexity, materialCost) {
+    const quantities = [];
+    const costs = [];
+
+    for (let q = 10; q <= baseQty * 1.5; q += Math.max(10, baseQty / 10)) {
+      const factor = 1 + complexity * 0.15;
+      quantities.push(q);
+      costs.push(q * materialCost * factor);
+    }
+
+    const ctx = document.getElementById("costChart").getContext("2d");
+
+    if (chart) {
+      chart.destroy();
+    }
+
+    chart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: quantities,
+        datasets: [{
+          label: "Estimated Cost vs Quantity",
+          data: costs,
+          borderWidth: 2,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: true }
+        },
+        scales: {
+          x: { title: { display: true, text: "Production Quantity" } },
+          y: { title: { display: true, text: "Estimated Cost (₹)" } }
+        }
+      }
+    });
+  }
+</script>
+
 
 </body>
 </html>
